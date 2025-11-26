@@ -27,9 +27,11 @@ Telegram适配器支持以下连接方式:
 
 ## 配置指南
 
-该项目目前仅支持[数组格式](https://github.com/botuniverse/onebot-11/blob/master/message/array.md)消息转发/接收,请确保你的框架支持该格式
+~~该项目目前仅支持[数组格式](https://github.com/botuniverse/onebot-11/blob/master/message/array.md)消息转发/接收,请确保你的框架支持该格式~~
 
-后续会逐渐适配其他格式,若有问题请移步issue提出
+~~后续会逐渐适配其他格式,若有问题请移步issue提出~~
+
+该项目支持数组格式与cq码格式
 
 支持proxy代理(HTTP(未测试)/SOCKS 账密),若有需要请在config.yml中配置
 
