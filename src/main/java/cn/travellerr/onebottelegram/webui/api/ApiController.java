@@ -11,6 +11,8 @@ import cn.travellerr.onebottelegram.onebotWebsocket.onebotSerialize.OnebotAction
 import cn.travellerr.onebottelegram.telegramApi.TelegramApi;
 import cn.travellerr.onebottelegram.webui.entity.BotInfo;
 import com.google.gson.JsonArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
@@ -20,6 +22,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 public class ApiController {
+
+    private static final Logger log = LoggerFactory.getLogger(ApiController.class);
     @GetMapping("/bot-info")
     public BotInfo getBotInfo(@RequestParam(value = "withAvatar", defaultValue = "false") boolean withAvatar) {
         return new BotInfo(TelegramApi.getMeResponse, TelegramApi.botAvatar, withAvatar);
@@ -42,7 +46,7 @@ public class ApiController {
             OnebotAction.sendMessage("0", contactId, array.toString(), isGroup);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to send message to contact", e);
             return false;
         }
     }

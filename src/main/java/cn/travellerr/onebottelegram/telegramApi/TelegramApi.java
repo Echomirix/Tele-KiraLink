@@ -150,7 +150,7 @@ public class TelegramApi {
     private static void setupLongPolling() {
         bot.setUpdatesListener(updates -> {
             new Thread(() -> updates.forEach(update -> {
-                System.out.println(BotUtils.toJson(update));
+                log.debug("Received update: {}", BotUtils.toJson(update));
                 Update newUpdate = callbackToMessage(update);
                 TelegramToOnebot.forwardToOnebot(newUpdate);
             })).start();
@@ -161,7 +161,7 @@ public class TelegramApi {
     private static OkHttpClient createBot() {
         bot = new TelegramBot(token);
 
-        Config.telegram.bot.proxy proxy = config.getTelegram().getBot().getProxy();
+        Config.Telegram.Bot.Proxy proxy = config.getTelegram().getBot().getProxy();
 
         if (proxy.getPort() != -1) {
             Proxy.Type proxyType = switch (proxy.getType()) {
@@ -174,8 +174,6 @@ public class TelegramApi {
             };
 
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
-                    .hostnameVerifier(SSLSocketClient.getHostnameVerifier())
-                    .sslSocketFactory(SSLSocketClient.getSSLSocketFactory(), SSLSocketClient.getX509TrustManager())
                     .proxy(new Proxy(proxyType, new InetSocketAddress(proxy.getHost(), proxy.getPort())));
 
             if (StringUtils.isNotEmpty(proxy.getUsername()) && StringUtils.isNotEmpty(proxy.getSecret())) {
@@ -198,7 +196,7 @@ public class TelegramApi {
 
             return clientBuilder.build();
         } else {
-            bot = new TelegramBot.Builder(token).okHttpClient(new OkHttpClient.Builder().hostnameVerifier((hostname, session) -> true).build()).build();
+            bot = new TelegramBot.Builder(token).okHttpClient(new OkHttpClient()).build();
         }
 
         return new OkHttpClient();

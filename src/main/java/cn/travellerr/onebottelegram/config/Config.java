@@ -17,36 +17,38 @@ import java.util.Map;
 @ConfigEntity(name = "config", filePath = "./")
 public class Config implements Serializable {
 
-    private telegram telegram;
-    private onebot onebot;
-    private spring spring;
-    private command command;
+    private Telegram telegram;
+    private Onebot onebot;
+    private Spring spring;
+    private Command command;
 
 
     @Data
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class telegram implements Serializable {
+    public static class Telegram implements Serializable {
 
-        private Config.telegram.bot bot;
-        private Config.telegram.webhook webhook;
+        private Config.Telegram.Bot bot;
+        private Config.Telegram.Webhook webhook;
 
         @Data
         @Builder
         @AllArgsConstructor
         @NoArgsConstructor
-        public static class bot implements Serializable {
+        public static class Bot implements Serializable {
             private String token;
             private String username;
-            private Config.telegram.bot.proxy proxy;
+            private Config.Telegram.Bot.Proxy proxy;
             private boolean useTranslator;
+            private String bingToken;
+            private String bingKey;
 
             @Data
             @Builder
             @AllArgsConstructor
             @NoArgsConstructor
-            public static class proxy implements Serializable {
+            public static class Proxy implements Serializable {
                 private String host;
                 private int port;
                 private String username;
@@ -61,7 +63,7 @@ public class Config implements Serializable {
         @Builder
         @AllArgsConstructor
         @NoArgsConstructor
-        public static class webhook implements Serializable {
+        public static class Webhook implements Serializable {
             private String certPath;
             private String secret;
             private String url;
@@ -74,7 +76,7 @@ public class Config implements Serializable {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class onebot implements Serializable {
+    public static class Onebot implements Serializable {
             private String ip;
             private String path;
             private int port;
@@ -90,9 +92,9 @@ public class Config implements Serializable {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class spring implements Serializable {
-        private Config.spring.database database;
-        private Config.spring.webui webui;
+    public static class Spring implements Serializable {
+        private Config.Spring.Database database;
+        private Config.Spring.Webui webui;
         private String ffmpegPath;
 
 
@@ -100,7 +102,7 @@ public class Config implements Serializable {
         @Builder
         @AllArgsConstructor
         @NoArgsConstructor
-        public static class database implements Serializable {
+        public static class Database implements Serializable {
             private DriveType dataType;
             private String mysqlUrl;
             private String mysqlUser;
@@ -111,7 +113,7 @@ public class Config implements Serializable {
         @Builder
         @AllArgsConstructor
         @NoArgsConstructor
-        public static class webui implements Serializable {
+        public static class Webui implements Serializable {
             private String userName;
             private String password;
         }
@@ -121,7 +123,7 @@ public class Config implements Serializable {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class command implements Serializable {
+    public static class Command implements Serializable {
         private String prefix;
         private Map<String, String> menu;
         private Map<String, String> commandMap;

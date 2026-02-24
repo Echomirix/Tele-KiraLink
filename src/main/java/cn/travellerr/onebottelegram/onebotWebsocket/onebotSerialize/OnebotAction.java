@@ -371,7 +371,7 @@ public class OnebotAction {
                         message = message.substring(7);
                     }
                     if (TelegramOnebotAdapter.config.getTelegram().getBot().isUseTranslator() && !languageCode.equals(LanguageCode.ZH_HANS)) {
-                        message = Translator.Trans(languageCode, message);
+                        message = Translator.translate(languageCode, message);
                     }
                     sb.append(message);
                     break;
