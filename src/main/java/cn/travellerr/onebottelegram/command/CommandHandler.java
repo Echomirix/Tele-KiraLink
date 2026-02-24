@@ -3,20 +3,20 @@ package cn.travellerr.onebottelegram.command;
 import cn.chahuyun.hibernateplus.HibernateFactory;
 import cn.travellerr.onebottelegram.TelegramOnebotAdapter;
 import cn.travellerr.onebottelegram.config.ConfigGenerator;
-import cn.travellerr.onebottelegram.hibernate.entity.Message;
 import cn.travellerr.onebottelegram.webui.api.LogWebSocketHandler;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.history.DefaultHistory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CommandHandler {
 
@@ -70,7 +70,8 @@ public class CommandHandler {
                     try {
                         Thread.sleep(1000);
                         executorService.shutdown();
-                        System.exit(0);
+                        int exitCode = SpringApplication.exit(TelegramOnebotAdapter.applicationContext);
+                        System.exit(exitCode);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
@@ -82,22 +83,23 @@ public class CommandHandler {
     }
 
     private String clean() {
-        List<Message> messages = HibernateFactory.selectList(Message.class);
         new Thread(() -> {
-            AtomicBoolean deleteSuccess = new AtomicBoolean(true);
-            messages.forEach(m -> deleteSuccess.set(HibernateFactory.delete(m)));
-            messages.forEach(m -> deleteSuccess.set(HibernateFactory.delete(m)));
-            if (deleteSuccess.get()) {
-                log.info("Chat history cleaned successfully.");
-                LogWebSocketHandler.broadcast("Chat history cleaned successfully.");
-            } else {
-                log.error("Failed to clean chat history.");
+            try {
+                SessionFactory sf = HibernateFactory.getSession();
+                try (Session session = sf.openSession()) {
+                    session.beginTransaction();
+                    int deleted = session.createMutationQuery("DELETE FROM Message").executeUpdate();
+                    session.getTransaction().commit();
+                    log.info("Chat history cleaned successfully, {} messages deleted.", deleted);
+                    LogWebSocketHandler.broadcast("Chat history cleaned successfully.");
+                }
+            } catch (Exception e) {
+                log.error("Failed to clean chat history.", e);
                 LogWebSocketHandler.broadcast("Failed to clean chat history.");
             }
         }).start();
 
-
-        return "Cleaning chat history, total messages: " + messages.size() + ", please wait...";
+        return "Cleaning chat history, please wait...";
     }
 
     private String reloadConfig() {

@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 
@@ -21,6 +22,7 @@ public class TelegramOnebotAdapter {
     public static TelegramOnebotAdapter INSTANCE = new TelegramOnebotAdapter();
     public static Config config;
     public static long startTime = System.currentTimeMillis();
+    public static ConfigurableApplicationContext applicationContext;
 
     public static void main(String[] args) {
         SpringApplication springApplication = new SpringApplication(TelegramOnebotAdapter.class);
@@ -48,7 +50,7 @@ public class TelegramOnebotAdapter {
                     Collections.singletonMap("server.port", config.getOnebot().getPort())));
         });
 
-        springApplication.run(args);
+        applicationContext = springApplication.run(args);
         CommandHandler.startCommandConsole();
     }
 

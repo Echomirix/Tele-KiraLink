@@ -2,6 +2,7 @@ package cn.travellerr.onebottelegram.converter;
 
 import cn.travellerr.onebotApi.TranslateResponseItem;
 import cn.travellerr.onebotApi.Translation;
+import cn.travellerr.onebottelegram.TelegramOnebotAdapter;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -13,11 +14,17 @@ public class Translator {
 
     private static final Logger logger = LoggerFactory.getLogger(Translator.class);
 
-    public static String Trans(LanguageCode to, String text) {
+    public static String translate(LanguageCode to, String text) {
         LanguageCode from = LanguageCode.AUTO;
+        String bingToken = TelegramOnebotAdapter.config.getTelegram().getBot().getBingToken();
+        String bingKey = TelegramOnebotAdapter.config.getTelegram().getBot().getBingKey();
+        if (bingToken == null || bingToken.isEmpty() || bingKey == null || bingKey.isEmpty()) {
+            logger.warn("Bing translator is enabled but bingToken/bingKey are not configured. Please set telegram.bot.bingToken and telegram.bot.bingKey in config.yml.");
+            return text;
+        }
         OkHttpClient okHttpClient = new OkHttpClient();
         RequestBody body = RequestBody.create(
-                ("fromLang="+from.getCode()+"&to="+to.getCode()+"&text="+text+"&tryFetchingGenderDebiasedTranslations=true&token=4hGHCk1A8zGjT-iDmwfYR8qgW8JyDcGL&key=1744467356960").getBytes()
+                ("fromLang="+from.getCode()+"&to="+to.getCode()+"&text="+text+"&tryFetchingGenderDebiasedTranslations=true&token="+bingToken+"&key="+bingKey).getBytes()
         );
         Request request = new Request.Builder()
                 .url("https://cn.bing.com/ttranslatev3?isVertical=1&IG=339F15526F524081823C28726EFC8796&IID=translator.5026")
@@ -32,7 +39,7 @@ public class Translator {
             }
             try {
                 String responseBody = response.body().string();
-                System.out.println(responseBody);
+                logger.debug("Bing translate response: {}", responseBody);
                 TranslateResponseItem responseItems = TranslateResponseItem.Companion.parse(responseBody.substring(1, responseBody.length() - 1));
                 Translation translation = responseItems.getTranslations().get(0);
 
